@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý chức vụ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="./Position.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar bên trái -->
+        <div class="sidebar">
+            <h2><i class="fas fa-building"></i> Menu</h2>
+            <ul>
+                <li><i class="fas fa-sitemap"></i> Phòng ban</li>
+                <li class="active"><i class="fas fa-user-tie"></i> Chức vụ</li>
+                <li><i class="fas fa-chart-bar"></i> Báo cáo</li>
+            </ul>
+        </div>
+        <!-- Nội dung chính -->
+        <div class="main">
+            <!-- Toast notifications -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span id="toastText"></span>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header với nút thêm và bộ lọc -->
+            <div class="header">
+                <h1><i class="fas fa-user-tie"></i> Quản lý chức vụ</h1>
+                <button id="btnAdd" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Thêm chức vụ
+                </button>
+            </div>
+      
+            <!-- Form tìm kiếm -->
+            <div class="section">
+                <div class="row">
+                    <div class="input-box">
+                        <label for="ma">Mã chức vụ</label>
+                        <input type="text" id="ma" placeholder="Nhập mã chức vụ" 
+                               class="form-control typeahead" autocomplete="off"
+                               data-provide="typeahead">
+                    </div>
+                    <div class="input-box">
+                        <label for="ten">Tên chức vụ</label>
+                        <input type="text" id="ten" placeholder="Nhập tên chức vụ" 
+                               class="form-control typeahead" autocomplete="off"
+                               data-provide="typeahead">
+                    </div>
+                    <div class="input-box">
+                        <button type="button" id="btnSearch" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <button type="button" id="btnReset" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+      
+            <!-- Bảng danh sách -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fas fa-list"></i> Danh sách chức vụ</h3>
+                    <span id="totalRecords" class="badge bg-primary">0 chức vụ</span>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Hành động</th>                            <th>Mã chức vụ</th>
+                            <th>Tên chức vụ</th>
+                            <th>Người đại diện</th>
+                            <th>Tuổi</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positionList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm/sửa chức vụ -->
+    <div class="modal fade" id="positionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Thêm chức vụ mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="positionForm" novalidate>
+                        <div class="mb-3">
+                            <label for="posCode" class="form-label">Mã chức vụ</label>
+                            <input type="text" class="form-control" id="posCode" required 
+                                placeholder="Nhập mã chức vụ"
+                                pattern="CV[0-9]{3}"
+                                title="Mã chức vụ phải có định dạng CVxxx (x là số)">
+                            <div class="invalid-feedback">
+                                Vui lòng nhập mã chức vụ đúng định dạng CVxxx
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="posName" class="form-label">Tên chức vụ</label>
+                            <input type="text" class="form-control" id="posName" required 
+                                placeholder="Nhập tên chức vụ"
+                                minlength="3"
+                                title="Tên chức vụ phải có ít nhất 3 ký tự">
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên chức vụ (ít nhất 3 ký tự)
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="posStatus" class="form-label">Trạng thái</label>                            <select class="form-select" id="posStatus">
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Không hoạt động</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="posRepresentative" class="form-label">Người đại diện</label>
+                            <input type="text" class="form-control" id="posRepresentative" required 
+                                placeholder="Nhập tên người đại diện"
+                                minlength="3"
+                                title="Tên người đại diện phải có ít nhất 3 ký tự">
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên người đại diện (ít nhất 3 ký tự)
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="posRepresentativeAge" class="form-label">Tuổi người đại diện</label>
+                            <input type="number" class="form-control" id="posRepresentativeAge" required 
+                                placeholder="Nhập tuổi người đại diện"
+                                min="18" max="65"
+                                title="Tuổi phải từ 18 đến 65">
+                            <div class="invalid-feedback">
+                                Tuổi người đại diện phải từ 18 đến 65
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="btnSavePosition">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa chức vụ này không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
+                </div>            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
+    <script src="../Init/initPosition.js"></script>
+    <script src="./Position.js"></script>
+    <script>
+        // Ensure modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the modal
+            window.positionModal = new bootstrap.Modal(document.getElementById('positionModal'));
+            
+            // Add button click handler
+            document.getElementById('btnAdd').addEventListener('click', function() {
+                document.getElementById('positionForm').reset();
+                document.getElementById('posCode').disabled = false;
+                window.positionModal.show();
+            });
+            
+            // Save button click handler
+            document.getElementById('btnSavePosition').addEventListener('click', function() {
+                if (typeof savePosition === 'function') {
+                    savePosition();
+                } else {
+                    console.error('savePosition function not found');
+                }
+            });
+        });
+    </script>    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="../../Init/initPosition.js"></script>
+    <script src="./Position.js"></script>
+  </body>
+</html>

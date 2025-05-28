@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý phòng ban</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="./Department.css">
+    <link href="../Home/index.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />    <style>
+    .dropdown-menu {
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .dropdown-item {
+        padding: 8px 15px;
+        cursor: pointer;
+    }
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+    .department-suggestion {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .department-code {
+        color: #6c757d;
+        font-size: 0.9em;
+    }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+      <header class="text-center text-white" style="margin-left: 0">
+        <h1>
+          <i class="bi bi-bullseye"></i>
+          ỨNG DỤNG QUẢN LÝ MỤC TIÊU OKR
+        </h1>
+      </header>
+      <nav
+        id="sidebar"
+        class="sidebar bg-primary rounded-0 d-flex flex-column align-items-start ps-4"
+      >
+        <button
+          class="sidebar-toggle"
+          id="toggleSidebar"
+          title="Thu gọn/Hiện menu"
+        >
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <ul class="nav flex-column w-100 mt-4">
+          <li class="nav-item">            <a class="nav-link text-white" href="../Home/Index.html">
+              <i class="bi bi-house-door"></i>
+              <span>Trang chủ</span>
+            </a>
+          </li>
+          <!-- Quản trị dropdown -->
+          <li class="nav-item">
+            <a
+              class="nav-link text-white"
+              data-bs-toggle="collapse"
+              href="#dropdownQuanTri"
+              role="button"
+              aria-expanded="false"
+              aria-controls="dropdownQuanTri"
+            >
+              <i class="bi bi-gear"></i>
+              <span>Quản trị</span>
+              <i class="bi bi-caret-down ms-auto"></i>
+            </a>
+            <div class="collapse ps-4" id="dropdownQuanTri">
+              <ul class="nav flex-column">                <li class="nav-item">
+                  <a class="nav-link text-white active" href="./Department.html">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>Phòng ban</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="../Position/Position.html">
+                    <i class="bi bi-person-badge"></i>
+                    <span>Chức vụ</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="#">
+                    <i class="bi bi-people"></i>
+                    <span>Người dùng</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <!-- OKR dropdown -->
+          <li class="nav-item">
+            <a
+              class="nav-link text-white"
+              data-bs-toggle="collapse"
+              href="#dropdownOKR"
+              role="button"
+              aria-expanded="false"
+              aria-controls="dropdownOKR"
+            >
+              <i class="bi bi-bullseye"></i>
+              <span>OKR</span>
+              <i class="bi bi-caret-down ms-auto"></i>
+            </a>
+            <div class="collapse ps-4" id="dropdownOKR">
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="#">
+                    <i class="bi bi-list-check"></i>
+                    <span>Object Key Result</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <!-- Báo cáo thống kê dropdown -->
+          <li class="nav-item">
+            <a
+              class="nav-link text-white"
+              data-bs-toggle="collapse"
+              href="#dropdownBaoCao"
+              role="button"
+              aria-expanded="false"
+              aria-controls="dropdownBaoCao"
+            >
+              <i class="bi bi-bar-chart-line"></i>
+              <span>Báo cáo thống kê</span>
+              <i class="bi bi-caret-down ms-auto"></i>
+            </a>
+            <div class="collapse ps-4" id="dropdownBaoCao">
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link text-white col-sm-4" href="#">
+                    <i class="bi bi-calendar3"></i>
+                    <span>BÁO CÁO KẾT QUẢ THEO NĂM</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="#">
+                    <i class="bi bi-calendar2-month"></i>
+                    <span>BÁO CÁO KẾT QUẢ THEO THÁNG</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="#">
+                    <span>BÁO CÁO KẾT QUẢ %</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      <main class="main-content bg-white">
+        <!-- Nội dung chính ở đây -->
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span id="toastText"></span>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            </div>            <!-- Header với tiêu đề và nút thêm -->
+            <div class="header">
+                <div>
+                    <h1 class="mb-0"><i class="fas fa-sitemap"></i> Quản lý phòng ban</h1>
+                    <p class="text-muted mt-1 mb-0">Quản lý thông tin các phòng ban trong tổ chức</p>
+                </div>
+                <button id="btnAdd" class="btn btn-success">
+                    <i class="fas fa-plus"></i>
+                    <span>Thêm phòng ban</span>
+                </button>
+            </div>
+      
+            <!-- Form nhập -->
+            <div class="section">
+                <div class="row">
+                    <div class="input-box">
+                        <label for="ma">Mã phòng</label>
+                        <input type="text" id="ma" placeholder="Nhập mã phòng" 
+                               class="form-control typeahead" autocomplete="off"
+                               data-provide="typeahead">
+                    </div>
+                    <div class="input-box">
+                        <label for="ten">Tên phòng</label>
+                        <input type="text" id="ten" placeholder="Nhập tên phòng" 
+                               class="form-control typeahead" autocomplete="off"
+                               data-provide="typeahead">
+                    </div>
+                    <div class="input-box">
+                        <button type="button" id="btnSearch" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <button type="button" id="btnReset" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+      
+            <!-- Bảng danh sách -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fas fa-list"></i> Danh sách phòng ban</h3>
+                    <span id="totalRecords" class="badge bg-primary">0 phòng ban</span>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Hành động</th>
+                            <th>Mã phòng</th>
+                            <th>Tên phòng</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departmentList">
+                        <tr>
+                            <td class="action-buttons">
+                                <button class="btn btn-warning btn-sm btn-edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm btn-delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                            <td>PB001</td>
+                            <td>Phòng Kỹ thuật</td>
+                            <td>27/05/2025</td>
+                            <td><span class="badge bg-success">Hoạt động</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm/sửa phòng ban -->
+    <div class="modal fade" id="departmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Thêm phòng ban mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">                    <form id="departmentForm" novalidate>
+                        <div class="mb-3">
+                            <label for="deptCode" class="form-label">Mã phòng ban</label>
+                            <input type="text" class="form-control" id="deptCode" required 
+                                placeholder="Nhập mã phòng ban"
+                                pattern="PB[0-9]{3}"
+                                title="Mã phòng ban phải có định dạng PBxxx (x là số)">
+                            <div class="invalid-feedback">
+                                Vui lòng nhập mã phòng ban đúng định dạng PBxxx
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="deptName" class="form-label">Tên phòng ban</label>
+                            <input type="text" class="form-control" id="deptName" required 
+                                placeholder="Nhập tên phòng ban"
+                                minlength="3"
+                                title="Tên phòng ban phải có ít nhất 3 ký tự">
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên phòng ban (ít nhất 3 ký tự)
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="deptStatus" class="form-label">Trạng thái</label>
+                            <select class="form-select" id="deptStatus">
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Không hoạt động</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveDepartment">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa phòng ban này không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
+                </div>
+            </div>
+        </div>
+      </main>
+      <footer class="text-center mt-4 text-secondary" style="margin-left: 0">
+        &copy; 2025 OKR Demo
+      </footer>
+    </div>    <!-- Application Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>    <!-- Application Scripts -->
+    <script src="../../Init/initDepartment.js"></script>
+    <script src="../Home/index.js"></script>
+    <script src="./Department.js"></script>
+  </body>
+</html>
