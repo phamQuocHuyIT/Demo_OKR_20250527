@@ -1,52 +1,76 @@
-class UserGroupManager {
-  constructor() {
-    this.groups = [];
-  }
-
-  // Thêm nhóm mới
-  add(code, name) {
-    const exists = this.groups.some((g) => g.code === code);
-    if (exists) return false;
-    this.groups.push({ code, name });
-    return true;
-  }
-
-  // Lấy danh sách nhóm
-  getAll() {
-    return this.groups;
-  }
-
-  // Lấy nhóm theo code
-  get(code) {
-    return this.groups.find((g) => g.code === code) || null;
-  }
-
-  // Cập nhật nhóm
-  update(code, newName) {
-    const group = this.groups.find((g) => g.code === code);
-    if (group) {
-      group.name = newName;
-      return true;
-    }
-    return false;
-  }
-
-  // Xóa nhóm
-  delete(code) {
-    const idx = this.groups.findIndex((g) => g.code === code);
-    if (idx !== -1) {
-      this.groups.splice(idx, 1);
-      return true;
-    }
-    return false;
+class UserGroup {
+  constructor(code, name) {
+    this.code = code;
+    this.name = name;
   }
 }
 
-// Ví dụ sử dụng:
-const userGroupManager = new UserGroupManager();
-userGroupManager.add("ADMIN", "Nhóm quản trị");
-userGroupManager.add("USER", "Nhóm người dùng");
-// userGroupManager.update("USER", "Nhóm nhân viên");
-// userGroupManager.delete("ADMIN");
-// console.log(userGroupManager.getAll());
+class UserGroupManager {
+  constructor() {
+    // Lấy dữ liệu từ localStorage hoặc khởi tạo dữ liệu mẫu
+    this.groups = UserGroupStorage.initData();
+  }
+
+  getAll() {
+    return Object.values(this.groups);
+  }
+
+  get(code) {
+    return this.groups[code] || null;
+  }
+
+  add(code, name) {
+    if (this.groups[code]) return false;
+    this.groups[code] = new UserGroup(code, name);
+    UserGroupStorage.saveData(this.groups);
+    return true;
+  }
+
+  update(code, name) {
+    if (!this.groups[code]) return false;
+    this.groups[code].name = name;
+    UserGroupStorage.saveData(this.groups);
+    return true;
+  }
+
+  delete(code) {
+    if (!this.groups[code]) return false;
+    delete this.groups[code];
+    UserGroupStorage.saveData(this.groups);
+    return true;
+  }
+}
+
+// Sample data for user groups
+let sampleUserGroups = {
+  ADMIN: { code: "ADMIN", name: "Nhóm quản trị" },
+  USER: { code: "USER", name: "Nhóm người dùng" },
+  MANAGER: { code: "MANAGER", name: "Nhóm quản lý" },
+};
+
+// Local Storage operations
+class UserGroupStorage {
+  static KEY = "userGroups";
+
+  static initData() {
+    if (!localStorage.getItem(this.KEY)) {
+      localStorage.setItem(this.KEY, JSON.stringify(sampleUserGroups));
+    }
+    return this.getData();
+  }
+
+  static getData() {
+    const data = localStorage.getItem(this.KEY);
+    return data ? JSON.parse(data) : {};
+  }
+
+  static saveData(groups) {
+    localStorage.setItem(this.KEY, JSON.stringify(groups));
+  }
+
+  static clearData() {
+    localStorage.removeItem(this.KEY);
+  }
+}
+
 export default UserGroupManager;
