@@ -93,7 +93,7 @@ function renderOkrTable() {
   });
 }
 
-// Render danh sách user vào select (dropdown) và KHÔNG gán lại onchange nhiều lần
+// Render danh sách user vào select (dropdown)
 function renderUserOptions(selected = []) {
   const select = document.getElementById("okrUsers");
   select.innerHTML = "";
@@ -105,6 +105,23 @@ function renderUserOptions(selected = []) {
     select.appendChild(option);
   });
   updateSelectedUsersDisplay();
+  enableMultiSelectWithoutCtrl();
+}
+
+// Cho phép chọn nhiều option không cần giữ Ctrl
+function enableMultiSelectWithoutCtrl() {
+  const select = document.getElementById("okrUsers");
+  if (select.dataset.multiClick) return;
+  select.dataset.multiClick = "1";
+  select.addEventListener("mousedown", function (e) {
+    e.preventDefault();
+    const option = e.target;
+    if (option.tagName.toLowerCase() === "option") {
+      option.selected = !option.selected;
+      // Gọi sự kiện change để cập nhật vùng hiển thị
+      select.dispatchEvent(new Event("change"));
+    }
+  });
 }
 
 // Gán sự kiện onchange cho select chỉ 1 lần
@@ -116,7 +133,7 @@ function setupUserSelectEvent() {
   }
 }
 
-// Hiển thị người dùng đã chọn
+// Hiển thị người dùng đã chọn với nút x để xóa
 function updateSelectedUsersDisplay() {
   const select = document.getElementById("okrUsers");
   const selectedCodes = Array.from(select.selectedOptions).map(
@@ -127,8 +144,28 @@ function updateSelectedUsersDisplay() {
     .filter((u) => selectedCodes.includes(u.code));
   const div = document.getElementById("okrSelectedUsers");
   div.innerHTML = users
-    .map((u) => `<span class="badge bg-info me-1">${u.name}</span>`)
+    .map(
+      (u) =>
+        `<span class="badge bg-info me-1 mb-1 d-inline-flex align-items-center">
+      ${u.name}
+      <button type="button" class="btn btn-sm btn-link text-white ms-1 p-0 btn-remove-user" data-user-code="${u.code}" title="Bỏ chọn">
+        <i class="bi bi-x"></i>
+      </button>
+    </span>`
+    )
     .join("");
+
+  // Gán sự kiện xóa cho từng nút x
+  div.querySelectorAll(".btn-remove-user").forEach((btn) => {
+    btn.onclick = function () {
+      const code = this.getAttribute("data-user-code");
+      // Bỏ chọn user trong select
+      Array.from(select.options).forEach((opt) => {
+        if (opt.value === code) opt.selected = false;
+      });
+      updateSelectedUsersDisplay();
+    };
+  });
 }
 
 // Render danh sách KeyResult trong modal
