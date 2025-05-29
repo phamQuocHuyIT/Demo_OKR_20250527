@@ -1,6 +1,6 @@
 class Position {
     constructor(code, name, status = true) {
-        this.id = crypto.randomUUID();
+        this.id = window.crypto.randomUUID();
         this.code = code;
         this.name = name;
         this.status = status;
@@ -18,9 +18,47 @@ class Position {
     }
 }
 
+const samplePositions = {
+    'CV001': new Position('CV001', 'Giám đốc'),
+    'CV002': new Position('CV002', 'Trưởng phòng'),
+    'CV003': new Position('CV003', 'Phó phòng'),
+    'CV004': new Position('CV004', 'Nhân viên')
+};
+
+class PositionStorage {
+    static KEY = 'positions';
+
+    static initData() {
+        const stored = localStorage.getItem(this.KEY);
+        if (!stored) {
+            this.saveData(samplePositions);
+            return samplePositions;
+        }
+        return JSON.parse(stored);
+    }
+
+    static getData() {
+        const data = localStorage.getItem(this.KEY);
+        return data ? JSON.parse(data) : {};
+    }
+
+    static saveData(positions) {
+        try {
+            localStorage.setItem(this.KEY, JSON.stringify(positions));
+            return true;
+        } catch (error) {
+            console.error('Error saving positions:', error);
+            throw error;
+        }
+    }
+
+    static clearData() {
+        localStorage.removeItem(this.KEY);
+    }
+}
+
 class PositionManager {
     constructor() {
-        // Lấy dữ liệu từ localStorage hoặc khởi tạo dữ liệu mẫu
         this.positions = PositionStorage.initData();
     }
 
@@ -82,46 +120,9 @@ class PositionManager {
     }
 }
 
-// Sample data for positions
-const samplePositions = {
-    'CV001': new Position('CV001', 'Giám đốc'),
-    'CV002': new Position('CV002', 'Trưởng phòng'),
-    'CV003': new Position('CV003', 'Phó phòng'),
-    'CV004': new Position('CV004', 'Nhân viên')
-};
+// Create a single instance of PositionManager
+const positionManager = new PositionManager();
 
-// Local Storage operations
-class PositionStorage {
-    static KEY = 'positions';
-
-    static initData() {
-        const stored = localStorage.getItem(this.KEY);
-        if (!stored) {
-            this.saveData(samplePositions);
-            return samplePositions;
-        }
-        return JSON.parse(stored);
-    }
-
-    static getData() {
-        const data = localStorage.getItem(this.KEY);
-        return data ? JSON.parse(data) : {};
-    }
-
-    static saveData(positions) {
-        try {
-            localStorage.setItem(this.KEY, JSON.stringify(positions));
-            return true;
-        } catch (error) {
-            console.error('Error saving positions:', error);
-            throw error;
-        }
-    }
-
-    static clearData() {
-        localStorage.removeItem(this.KEY);
-    }
-}
-
-// Create and export instance
-window.positionManager = new PositionManager();
+// Export the instance as default
+export default positionManager;
+export { Position, PositionStorage };
